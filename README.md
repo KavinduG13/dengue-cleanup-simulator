@@ -1,66 +1,33 @@
-# [Project Title]
+# Data
 
-[One-sentence pitch: what this simulation does and the question it answers.]
+| File | Description | Source (with link) | Licence | Date accessed |
+|---|---|---|---|---|
+| `colombo_weekly_dengue_2026.csv` | Weekly notified dengue cases, Colombo district, 2026 epidemiological weeks 1–37 (29 Dec 2025 – 13 Sep 2026) | Weekly Epidemiological Report (WER), Epidemiology Unit, Ministry of Health, Sri Lanka, Table 1, column A, as extracted in the `denguedatahub` R package by T. S. Talagala, file `data-raw/srilanka_weekly_data.csv`, commit [`6fd04ff`](https://github.com/thiyangt/denguedatahub/blob/6fd04ff513a5586b2338d02af759e06e3aa771d2/data-raw/srilanka_weekly_data.csv) | Counts from public government surveillance reports; extraction from `denguedatahub` (GPL-3), credited here | 25 Nov 2026 |
+| `make_dataset.py` | Script that rebuilds the CSV from the pinned commit above | – | MIT (this repository) | – |
 
-**[Live demo](https://KavinduG13.github.io/dengue-cleanup-simulator/)** · [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/KavinduG13/dengue-cleanup-simulator/blob/main/notebook/dengue-cleanup-simulator.ipynb)
+## Columns
 
-![Screenshot of the web demo](figures/demo-screenshot.png)
+| Column | Meaning |
+|---|---|
+| `year`, `epi_week` | Year and ISO epidemiological week (Monday–Sunday) |
+| `week_start`, `week_end` | First and last day of the week |
+| `cases_raw` | Value as it appears in the source extraction |
+| `status` | `ok`, or `missing` for weeks excluded from the analysis |
+| `cases` | Value used in the model (empty when `status` is `missing`) |
+| `note` | Reason a week is marked missing |
+| `source` | Dataset and commit the row came from |
 
-## The problem
+## Data checks and decisions
 
-[The real-world situation, the specific question this simulation answers, and why it matters. Plain English, 1–2 short paragraphs.]
+- **Spot check against the original report:** week 27 (29 Jun – 5 Jul 2026) is 1,264 cases in both the extraction and WER Vol. 53 No. 28, Table 1. `make_dataset.py` asserts this value.
+- **Weeks marked missing (5 of 37):**
+  - Weeks 14, 24 and 37: the extracted values (9, 20, 11) are far below the neighbouring weeks and are similarly low for several other districts in the same week, while the national total stays in line with the neighbouring weeks, which points to a parsing error.
+  - Weeks 25 and 26: identical values for every district, which means one report was read twice. The true values are unknown.
+- Missing weeks are skipped in the likelihood, not filled in.
+- **Only Epidemiology Unit (WER) counts are used.** National Dengue Control Unit figures quoted in the news come from a different reporting system and give different totals, so they are not mixed in.
+- **Colombo is one row** in WER Table 1 (no separate Colombo Municipal Council row), so no counts are added together.
+- **Intervention inside the data:** a special dengue control week ran across Colombo District on 15–21 June 2026 (week 25). This is treated as part of the baseline and listed as a limitation.
 
-## Quick start
+## Population
 
-**Notebook:** click the *Open in Colab* badge above, then *Runtime → Run all*. Everything installs and runs in about [N] minutes on a free runtime.
-
-**Web demo:** open the [live demo](https://KavinduG13.github.io/dengue-cleanup-simulator/), or download this repository and double-click `docs/index.html`.
-
-**Run locally (optional):**
-
-```bash
-pip install -r requirements.txt
-jupyter notebook notebook/dengue-cleanup-simulator.ipynb
-```
-
-## Using the demo
-
-[Two or three sentences on the main controls and outputs.] Full guide: [USER_GUIDE.md](USER_GUIDE.md).
-
-## Model and mathematics
-
-[Short summary of the model with its key equation(s), e.g. $\frac{dx}{dt} = f(x, t)$, and the numerical method.] Full derivations, assumptions and parameters: [THEORY.md](THEORY.md).
-
-## Verification
-
-[How you know the numbers are right: the check(s) you ran and the result, e.g. "the simulated mean wait matches the analytic M/M/1 value to within 2%".]
-
-![Verification plot](figures/verification.png)
-
-## Concepts applied
-
-[Name the modelling and numerical concepts this project applies and how each is used. Generic wording only. Example: "This project applies next-event time-advance discrete-event simulation, inverse-transform random variate generation and Monte Carlo confidence intervals based on the law of large numbers, and verifies the simulator against analytic steady-state results."]
-
-## Results
-
-[The answer to the question, with the key figure or table.]
-
-## Limitations and future work
-
-- [Most important assumption and how it limits the result]
-- [What you would add with more time or data]
-
-## Key references
-
-1. [Author, "Title," *Venue*, year. DOI/URL]
-2. [...]
-
-Full list: [REFERENCES.md](REFERENCES.md).
-
-## AI assistance
-
-Developed with the help of AI coding and writing assistants. All code was reviewed, run and verified by the author.
-
-## Licence and credits
-
-Code: [MIT](LICENSE). Data: [source, licence, e.g. "Weather data: Open-Meteo, CC BY 4.0"].
+Colombo District population: **2,375,415** (Census of Population and Housing 2024, final report, Department of Census and Statistics, Sri Lanka).
