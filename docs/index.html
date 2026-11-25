@@ -3,62 +3,70 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>[Project Title]: Interactive Demo</title>
-<!--
-  STARTER TEMPLATE. The example simulation below is a Monte Carlo estimate of pi.
-  It is here only to show the required structure:
-    - at least three adjustable parameters
-    - Start / Pause / Reset
-    - a live visualisation
-    - at least one quantitative output, checked against a reference value
-    - an "About / How to use" panel
-  Replace the SIMULATION section and the controls with your own model.
--->
+<title>Dengue Clean-Up Campaign Simulator: Interactive Demo</title>
+<link rel="icon" href="data:,">
 <style>
-  :root { --ink:#1b2430; --muted:#5d6876; --line:#d8dee6; --accent:#1f6f8b; --bg:#f6f8fa; --ok:#1a7f37; --warn:#b35900; }
+  :root { --ink:#1b2430; --muted:#5d6876; --line:#d8dee6; --accent:#1f6f8b; --bg:#f6f8fa; --ok:#1a7f37; --warn:#b35900;
+          --base:#8a94a3; --scen:#1f6f8b; --camp:#e08a1e; --obs:#1b2430; }
   * { box-sizing: border-box; }
   body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:var(--bg); }
   header { padding:16px 20px; background:#fff; border-bottom:1px solid var(--line); }
   header h1 { margin:0; font-size:1.3rem; }
   header p { margin:4px 0 0; color:var(--muted); font-size:.95rem; }
-  main { display:grid; grid-template-columns: 300px 1fr; gap:16px; padding:16px 20px; max-width:1200px; margin:0 auto; }
-  @media (max-width: 800px) { main { grid-template-columns: 1fr; } }
+  main { display:grid; grid-template-columns: 320px 1fr; gap:16px; padding:16px 20px; max-width:1250px; margin:0 auto; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
   .panel { background:#fff; border:1px solid var(--line); border-radius:8px; padding:14px; }
-  label { display:block; font-size:.9rem; margin:12px 0 4px; }
+  label { display:block; font-size:.9rem; margin:14px 0 4px; }
   label span { float:right; font-variant-numeric: tabular-nums; color:var(--muted); }
+  .hint { font-size:.78rem; color:var(--muted); margin:2px 0 0; }
   input[type=range] { width:100%; }
-  input[type=number] { width:100%; padding:6px; border:1px solid var(--line); border-radius:4px; }
-  .buttons { display:flex; gap:8px; margin-top:16px; }
+  .buttons { display:flex; gap:8px; margin-top:18px; }
   button { flex:1; padding:8px; border:1px solid var(--accent); background:var(--accent); color:#fff; border-radius:6px; font-size:.95rem; cursor:pointer; }
   button.secondary { background:#fff; color:var(--accent); }
-  canvas { width:100%; max-width:560px; aspect-ratio:1; display:block; margin:0 auto; background:#fff; border:1px solid var(--line); }
-  .stats { display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap:10px; margin-top:14px; }
+  button:disabled { opacity:.55; cursor:default; }
+  canvas { width:100%; aspect-ratio:16/10; display:block; background:#fff; border:1px solid var(--line); border-radius:6px; }
+  .stats { display:grid; grid-template-columns: repeat(auto-fit, minmax(165px,1fr)); gap:10px; margin-top:14px; }
   .stat { border:1px solid var(--line); border-radius:6px; padding:10px; }
   .stat .k { font-size:.8rem; color:var(--muted); }
   .stat .v { font-size:1.2rem; font-variant-numeric: tabular-nums; }
-  .check.ok { color:var(--ok); } .check.warn { color:var(--warn); }
-  details { margin-top:16px; }
+  .stat .s { font-size:.78rem; color:var(--muted); font-variant-numeric: tabular-nums; }
+  .stat.key { border-color:var(--accent); }
+  .checks { margin-top:14px; border-top:1px solid var(--line); padding-top:10px; font-size:.88rem; }
+  .checks div { margin:3px 0; font-variant-numeric: tabular-nums; }
+  .ok { color:var(--ok); } .warn { color:var(--warn); }
+  details { margin-top:18px; }
   summary { cursor:pointer; font-weight:600; }
-  details p, details li { font-size:.92rem; line-height:1.45; }
+  details p, details li { font-size:.9rem; line-height:1.45; }
+  details ul { padding-left:18px; }
 </style>
 </head>
 <body>
 <header>
-  <h1>[Project Title]</h1>
-  <p>[One-sentence description of what the simulation shows.]</p>
+  <h1>Dengue Clean-Up Campaign Simulator: Colombo District</h1>
+  <p>How early and how large must a breeding-site clean-up campaign be to halve the peak of a dengue wave? A host–vector model calibrated to the 2026 monsoon wave.</p>
 </header>
 
 <main>
   <section class="panel" aria-label="Controls">
-    <!-- REPLACE: your own parameters (at least three) -->
-    <label for="nTotal">Total samples <span id="nTotalVal"></span></label>
-    <input id="nTotal" type="range" min="1000" max="200000" step="1000" value="50000">
+    <label for="pCut">Clean-up intensity <span id="pCutVal"></span></label>
+    <input id="pCut" type="range" min="0" max="0.9" step="0.05" value="0">
+    <p class="hint">Share of new adult mosquitoes removed from the campaign start onwards.</p>
 
-    <label for="speed">Samples per frame (speed) <span id="speedVal"></span></label>
-    <input id="speed" type="range" min="10" max="5000" step="10" value="200">
+    <label for="offset">Campaign start <span id="offsetVal"></span></label>
+    <input id="offset" type="range" min="0" max="8" step="1" value="8">
+    <p class="hint">Weeks before the expected (no-campaign) peak. 8 = start of the modelled wave.</p>
 
-    <label for="seed">Random seed</label>
-    <input id="seed" type="number" value="42" min="1" step="1">
+    <label for="r0">Basic reproduction number R0 <span id="r0Val"></span></label>
+    <input id="r0" type="range" min="1.2" max="3" step="any">
+    <p class="hint">Default is the calibrated value. Higher means faster spread.</p>
+
+    <label for="rho">Reporting fraction <span id="rhoVal"></span></label>
+    <input id="rho" type="range" min="0.005" max="0.1" step="any">
+    <p class="hint">Share of infections that appear as reported cases. Scales the curve.</p>
+
+    <label for="life">Adult mosquito lifespan <span id="lifeVal"></span></label>
+    <input id="life" type="range" min="7" max="21" step="0.5" value="14">
+    <p class="hint">Sets how fast mosquito numbers fall after a campaign starts (R0 is held fixed).</p>
 
     <div class="buttons">
       <button id="startBtn">Start</button>
@@ -67,115 +75,269 @@
 
     <details>
       <summary>About / How to use</summary>
-      <!-- REPLACE: explain your model, its parameters and how to read the outputs -->
-      <p>This example estimates &pi; by sampling random points in a unit square and counting the fraction that falls inside the quarter circle: &pi; &asymp; 4 &times; (inside / total).</p>
+      <p><b>Model.</b> Humans follow an SEIR model and <i>Aedes</i> mosquitoes an SEI model. A clean-up campaign cuts the recruitment of new adult mosquitoes by the chosen intensity from its start week until the end of the season; adults already alive die off at their natural rate. The equations are solved with a fourth-order Runge–Kutta method (time step 0.5 days), the same code as the notebook ported to JavaScript.</p>
+      <p><b>Calibration.</b> The default transmission rate, reporting fraction and starting infections are the posterior medians from a Metropolis MCMC fit to weekly reported dengue cases in Colombo District, epidemiological weeks 20–36 of 2026 (Epidemiology Unit, Weekly Epidemiological Report).</p>
       <ul>
-        <li>Set the parameters, then press <b>Start</b>. <b>Pause</b> stops the run; <b>Reset</b> clears it and applies new settings.</li>
-        <li>The estimate is shown with a 95% confidence interval. The error should shrink roughly as 1/&radic;N.</li>
-        <li>The check compares the estimate with the reference value; the notebook gives the same result for the default settings.</li>
+        <li>Move the sliders, then press <b>Start</b> to watch the season unfold week by week. <b>Pause</b> stops it; moving a slider updates the curves and outputs immediately. <b>Reset</b> restores the default settings.</li>
+        <li>Grey dashed line: no campaign. Blue line: with the campaign. Black dots: reported cases. The orange line marks the campaign start.</li>
+        <li><b>Try this:</b> set intensity to 50% and the start to 8 weeks: the peak roughly halves. Now move the start to 2 weeks: almost no change, because removing breeding sites takes 3–4 weeks to show up in cases (mosquito lifespan, then about 10 days inside the mosquito and about 5.5 days in the person).</li>
+        <li>The checks at the bottom recompute two notebook reference values with the default settings; both must agree to within 1%.</li>
       </ul>
+      <p><b>Limitations.</b> One deterministic curve (the uncertainty bands are in the notebook), homogeneous mixing across the district, one serotype, and a campaign that keeps working at a constant level. The flat pre-monsoon weeks before week 20 are not modelled.</p>
+      <p>Code, notebook and data: <a href="https://github.com/KavinduG13/dengue-cleanup-simulator">GitHub repository</a>.</p>
     </details>
   </section>
 
   <section class="panel" aria-label="Simulation">
-    <canvas id="view" width="560" height="560" aria-label="Live visualisation"></canvas>
+    <canvas id="view" aria-label="Weekly reported dengue cases, with and without the campaign"></canvas>
     <div class="stats">
-      <div class="stat"><div class="k">Samples so far</div><div class="v" id="outN">0</div></div>
-      <div class="stat"><div class="k">Estimate &plusmn; 95% CI</div><div class="v" id="outEst">–</div></div>
-      <div class="stat"><div class="k">Reference value</div><div class="v" id="outRef">3.14159</div></div>
-      <div class="stat"><div class="k">Check</div><div class="v check" id="outCheck">–</div></div>
+      <div class="stat key"><div class="k">Peak reduction</div><div class="v" id="outRed">–</div><div class="s" id="outRedS"></div></div>
+      <div class="stat"><div class="k">Peak weekly cases (with campaign)</div><div class="v" id="outPeak">–</div><div class="s" id="outPeakS"></div></div>
+      <div class="stat"><div class="k">Peak weekly cases (no campaign)</div><div class="v" id="outBase">–</div><div class="s" id="outBaseS"></div></div>
+      <div class="stat"><div class="k">Total reported cases, weeks 20–49</div><div class="v" id="outTot">–</div><div class="s" id="outTotS"></div></div>
+      <div class="stat"><div class="k">R0 and critical cut p<sub>c</sub></div><div class="v" id="outR0">–</div><div class="s">p<sub>c</sub> = 1 − 1/R0²: a cut above this from the start stops the outbreak</div></div>
+      <div class="stat"><div class="k">Week shown</div><div class="v" id="outWeek">–</div><div class="s" id="outWeekS"></div></div>
+    </div>
+    <div class="checks" aria-label="Checks against the notebook">
+      <div id="check1">–</div>
+      <div id="check2">–</div>
     </div>
   </section>
 </main>
 
 <script>
-// ---------- seeded random number generator (reproducible runs) ----------
-function mulberry32(a) {
-  return function () {
-    a |= 0; a = a + 0x6D2B79F5 | 0;
-    let t = Math.imul(a ^ a >>> 15, 1 | a);
-    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-  };
+"use strict";
+// ---------- fixed inputs and calibrated values (notebook sections 2, 3 and 5.1) ----------
+const N = 0.30 * 2375415;                 // effective susceptible population (susceptible fraction x Census 2024 population)
+const SIGMA_H = 1 / 5.5, GAMMA = 1 / 5, SIGMA_V = 1 / 10, M0 = 2;
+const MU_V_DEFAULT = 1 / 14;
+const THETA = { beta: 0.2165331670156877, rho: 0.02080209358072617, I0: 5532.140033155348 }; // posterior medians
+const START_WEEK = 20, HORIZON = 30, DT = 0.5, STEPS_PER_WEEK = 14;
+const REF = { baseline: 1474.6, campaign: 728.8, p: 0.5, offset: 8 };  // notebook section 5.6
+const OBS = [[20,308],[21,368],[22,437],[23,507],[24,null],[25,null],[26,null],[27,1264],[28,1625],[29,1475],
+             [30,1189],[31,995],[32,707],[33,500],[34,334],[35,286],[36,186],[37,null]];
+
+// ---------- model ----------
+function r0From(beta, muV) { return Math.sqrt(beta * beta * M0 * SIGMA_V / (GAMMA * muV * (SIGMA_V + muV))); }
+function betaFrom(r0, muV) { return r0 * Math.sqrt(GAMMA * muV * (SIGMA_V + muV) / (M0 * SIGMA_V)); }
+
+function rhs(y, beta, lam, muV) {
+  const [s, e, i, r, c, Vs, Ve, Vi] = y;
+  const infH = beta * Vi * s, infV = beta * i * Vs;
+  return [-infH, infH - SIGMA_H * e, SIGMA_H * e - GAMMA * i, GAMMA * i, SIGMA_H * e,
+          lam - infV - muV * Vs, infV - (SIGMA_V + muV) * Ve, SIGMA_V * Ve - muV * Vi];
 }
 
-// ---------- SIMULATION (REPLACE with your own model) ----------
-const REFERENCE = Math.PI;          // analytic / notebook reference value
-const sim = { rng: null, n: 0, inside: 0, nTotal: 0 };
-
-function initSim(params) {
-  sim.rng = mulberry32(params.seed);
-  sim.n = 0; sim.inside = 0; sim.nTotal = params.nTotal;
+function rk4Step(y, dt, f) {
+  const k1 = f(y);
+  const k2 = f(y.map((v, j) => v + dt / 2 * k1[j]));
+  const k3 = f(y.map((v, j) => v + dt / 2 * k2[j]));
+  const k4 = f(y.map((v, j) => v + dt * k3[j]));
+  return y.map((v, j) => v + dt / 6 * (k1[j] + 2 * k2[j] + 2 * k3[j] + k4[j]));
 }
 
-function stepSim(k, draw) {                 // advance the model by k samples
-  for (let i = 0; i < k && sim.n < sim.nTotal; i++) {
-    const x = sim.rng(), y = sim.rng();
-    const hit = x * x + y * y <= 1;
-    sim.n++; if (hit) sim.inside++;
-    draw(x, y, hit);
+// starting state on the dominant eigenvector of the linearised infected system (notebook section 3.3)
+function initialState(beta, I0, muV) {
+  const J = [[-SIGMA_H, 0, 0, beta],
+             [SIGMA_H, -GAMMA, 0, 0],
+             [0, beta * M0, -(SIGMA_V + muV), 0],
+             [0, 0, SIGMA_V, -muV]];
+  let v = [1, 1, 1, 1];                       // power iteration on J + I (non-negative matrix -> Perron vector)
+  for (let it = 0; it < 5000; it++) {
+    const w = J.map((row, a) => row.reduce((acc, x, b) => acc + x * v[b], 0) + v[a]);
+    const norm = Math.max(...w.map(Math.abs));
+    v = w.map((x) => x / norm);
   }
+  const scale = (I0 / N) / v[1];
+  const [e0, i0, Ve0, Vi0] = v.map((x) => Math.abs(x) * scale);
+  return [1 - e0 - i0, e0, i0, 0, 0, M0 - Ve0 - Vi0, Ve0, Vi0];
 }
 
-function estimate() {                       // quantitative output with uncertainty
-  if (sim.n === 0) return null;
-  const p = sim.inside / sim.n;
-  const est = 4 * p;
-  const se = 4 * Math.sqrt(p * (1 - p) / sim.n);
-  return { est, ci: 1.96 * se };
+// weekly reported cases over HORIZON weeks; campaign cuts recruitment by p from day tc (on the time grid)
+function weeklyCases(beta, rho, I0, muV, p, tc) {
+  let y = initialState(beta, I0, muV);
+  const lam0 = M0 * muV, nSteps = HORIZON * STEPS_PER_WEEK, cutStep = Math.round(tc / DT);
+  const cWeek = [y[4]];
+  for (let k = 0; k < nSteps; k++) {
+    const lam = k >= cutStep ? lam0 * (1 - p) : lam0;    // step k covers [k dt, (k+1) dt]; never straddles tc
+    y = rk4Step(y, DT, (yy) => rhs(yy, beta, lam, muV));
+    if ((k + 1) % STEPS_PER_WEEK === 0) cWeek.push(y[4]);
+  }
+  return cWeek.slice(1).map((c, w) => rho * N * (c - cWeek[w]));
 }
 
-// ---------- UI wiring (keep the pattern, adapt the details) ----------
+function argmax(a) { return a.reduce((best, x, j) => (x > a[best] ? j : best), 0); }
+function sum(a) { return a.reduce((acc, x) => acc + x, 0); }
+
+function runScenario(prm) {
+  const muV = 1 / prm.life, beta = prm.beta;
+  const base = weeklyCases(beta, prm.rho, THETA.I0, muV, 0, Infinity);
+  const pk = argmax(base);
+  const startIdx = Math.max(pk - prm.offset, 0);
+  const camp = weeklyCases(beta, prm.rho, THETA.I0, muV, prm.p, 7 * startIdx);
+  return { base, camp, pk, startIdx, beta, muV };
+}
+
+// ---------- UI ----------
 const $ = (id) => document.getElementById(id);
-const ctx = $("view").getContext("2d");
-let running = false, frame = null;
+const canvas = $("view"), ctx = canvas.getContext("2d");
+const DEFAULTS = { p: 0, offset: 8, r0: r0From(THETA.beta, MU_V_DEFAULT), rho: THETA.rho, life: 14 };
+let state = null, shownWeek = 0, running = false, frame = null, lastTick = 0;
 
 function params() {
-  return { nTotal: +$("nTotal").value, speed: +$("speed").value, seed: Math.max(1, Math.floor(+$("seed").value) || 1) };
+  const life = +$("life").value, r0 = +$("r0").value;
+  const atDefault = Math.abs(r0 - DEFAULTS.r0) < 1e-12 && life === DEFAULTS.life;
+  return { p: +$("pCut").value, offset: +$("offset").value, rho: +$("rho").value, life, r0,
+           beta: atDefault ? THETA.beta : betaFrom(r0, 1 / life) };
+}
+function setDefaults() {
+  $("pCut").value = DEFAULTS.p; $("offset").value = DEFAULTS.offset; $("r0").value = DEFAULTS.r0;
+  $("rho").value = DEFAULTS.rho; $("life").value = DEFAULTS.life;
 }
 function showParams() {
-  $("nTotalVal").textContent = (+$("nTotal").value).toLocaleString();
-  $("speedVal").textContent = (+$("speed").value).toLocaleString();
+  const q = params();
+  $("pCutVal").textContent = `${Math.round(q.p * 100)}%`;
+  $("offsetVal").textContent = `${q.offset} week${q.offset === 1 ? "" : "s"} before peak`;
+  $("r0Val").textContent = q.r0.toFixed(2);
+  $("rhoVal").textContent = `${(q.rho * 100).toFixed(2)}%`;
+  $("lifeVal").textContent = `${q.life.toFixed(1)} days`;
 }
-function clearView() {
-  const w = ctx.canvas.width;
-  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, w);
-  ctx.strokeStyle = "#1b2430"; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.arc(0, w, w, -Math.PI / 2, 0); ctx.stroke();
-}
-function drawPoint(x, y, hit) {
-  const w = ctx.canvas.width;
-  ctx.fillStyle = hit ? "rgba(31,111,139,0.55)" : "rgba(179,89,0,0.55)";
-  ctx.fillRect(x * w, (1 - y) * w, 1.5, 1.5);
-}
+const fmt = (x) => Math.round(x).toLocaleString("en-US");
+
 function showOutputs() {
-  $("outN").textContent = sim.n.toLocaleString();
-  const e = estimate();
-  if (!e) { $("outEst").textContent = "–"; $("outCheck").textContent = "–"; $("outCheck").className = "v check"; return; }
-  $("outEst").textContent = `${e.est.toFixed(4)} ± ${e.ci.toFixed(4)}`;
-  const ok = Math.abs(e.est - REFERENCE) <= e.ci;
-  $("outCheck").textContent = ok ? "Within CI" : "Outside CI";
-  $("outCheck").className = "v check " + (ok ? "ok" : "warn");
+  const q = params(), s = state;
+  const bPk = Math.max(...s.base), cPk = Math.max(...s.camp);
+  const red = 100 * (1 - cPk / bPk);
+  $("outRed").textContent = `${red.toFixed(1)}%`;
+  $("outRedS").textContent = q.p === 0 ? "set an intensity above 0%" : (red >= 50 ? "peak at least halved" : "peak not halved");
+  $("outRedS").className = "s " + (q.p > 0 && red >= 50 ? "ok" : "");
+  $("outPeak").textContent = fmt(cPk);
+  $("outPeakS").textContent = `in epi week ${START_WEEK + argmax(s.camp)}`;
+  $("outBase").textContent = fmt(bPk);
+  $("outBaseS").textContent = `in epi week ${START_WEEK + s.pk}`;
+  const tb = sum(s.base), tcmp = sum(s.camp);
+  $("outTot").textContent = fmt(tcmp);
+  $("outTotS").textContent = `${(100 * (1 - tcmp / tb)).toFixed(1)}% fewer than ${fmt(tb)} with no campaign`;
+  const r0 = r0From(s.beta, s.muV);
+  $("outR0").textContent = `${r0.toFixed(2)}  ·  ${(100 * (1 - 1 / (r0 * r0))).toFixed(0)}%`;
+  $("outWeek").textContent = shownWeek === 0 ? "–" : `${START_WEEK + shownWeek - 1}`;
+  $("outWeekS").textContent = q.p > 0 ? `campaign starts in epi week ${START_WEEK + s.startIdx}` : "no campaign set";
 }
-function loop() {
-  stepSim(params().speed, drawPoint);
-  showOutputs();
-  if (sim.n >= sim.nTotal) { stop(); $("startBtn").textContent = "Done"; $("startBtn").disabled = true; return; }
+
+function niceMax(x) {
+  const e = Math.pow(10, Math.floor(Math.log10(x))), m = x / e;
+  return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * e;
+}
+
+function draw() {
+  const dpr = window.devicePixelRatio || 1, W = canvas.clientWidth, H = canvas.clientHeight;
+  if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) {
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+  }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  // legend layout first, so it can wrap onto extra rows on narrow screens
+  const items = [["#8a94a3", "dash", "no campaign"], ["#1f6f8b", "line", "with campaign"],
+                 ["#1b2430", "dot", "reported cases"], ["#e08a1e", "line", "campaign start"]];
+  ctx.font = "12px system-ui, sans-serif";
+  const L = 62, R = 16, B = 44, legend = [];
+  let lx = L + 10, row = 0;
+  items.forEach((it) => {
+    const wItem = 34 + ctx.measureText(it[2]).width;
+    if (lx + wItem > W - R && lx > L + 10) { row++; lx = L + 10; }
+    legend.push([...it, lx, row]); lx += wItem;
+  });
+  const T = 18 + 18 * (row + 1), pw = W - L - R, ph = H - T - B;
+  const s = state, q = params();
+  const obsMax = Math.max(...OBS.filter((o) => o[1] !== null).map((o) => o[1]));
+  const yMax = niceMax(1.08 * Math.max(...s.base, ...s.camp, obsMax));
+  const X = (w) => L + (w - START_WEEK + 0.5) / HORIZON * pw;     // centre of week w
+  const Y = (v) => T + ph - v / yMax * ph;
+
+  // grid and axes
+  ctx.font = "12px system-ui, sans-serif"; ctx.lineWidth = 1;
+  for (let k = 0; k <= 5; k++) {
+    const v = yMax * k / 5, yy = Y(v);
+    ctx.strokeStyle = "#eef1f4"; ctx.beginPath(); ctx.moveTo(L, yy); ctx.lineTo(L + pw, yy); ctx.stroke();
+    ctx.fillStyle = "#5d6876"; ctx.textAlign = "right"; ctx.textBaseline = "middle"; ctx.fillText(fmt(v), L - 8, yy);
+  }
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  for (let w = START_WEEK; w < START_WEEK + HORIZON; w += 2) ctx.fillText(String(w), X(w), T + ph + 6);
+  ctx.fillText("epidemiological week, 2026", L + pw / 2, T + ph + 24);
+  ctx.save(); ctx.translate(14, T + ph / 2); ctx.rotate(-Math.PI / 2); ctx.textBaseline = "middle";
+  ctx.fillText("reported cases per week", 0, 0); ctx.restore();
+  ctx.strokeStyle = "#5d6876"; ctx.beginPath(); ctx.moveTo(L, T); ctx.lineTo(L, T + ph); ctx.lineTo(L + pw, T + ph); ctx.stroke();
+
+  // campaign period
+  if (q.p > 0) {
+    const xs = L + s.startIdx / HORIZON * pw;
+    ctx.fillStyle = "rgba(224,138,30,0.07)"; ctx.fillRect(xs, T, L + pw - xs, ph);
+    ctx.strokeStyle = "#e08a1e"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(xs, T); ctx.lineTo(xs, T + ph); ctx.stroke();
+  }
+  // baseline (full season, dashed)
+  ctx.strokeStyle = "#8a94a3"; ctx.lineWidth = 2; ctx.setLineDash([6, 4]); ctx.beginPath();
+  s.base.forEach((v, w) => (w === 0 ? ctx.moveTo(X(START_WEEK + w), Y(v)) : ctx.lineTo(X(START_WEEK + w), Y(v))));
+  ctx.stroke(); ctx.setLineDash([]);
+  // observed cases
+  ctx.fillStyle = "#1b2430";
+  OBS.forEach(([w, c]) => { if (c !== null) { ctx.beginPath(); ctx.arc(X(w), Y(c), 3.2, 0, 2 * Math.PI); ctx.fill(); } });
+  // scenario, revealed week by week
+  if (shownWeek > 0) {
+    ctx.strokeStyle = "#1f6f8b"; ctx.lineWidth = 3; ctx.beginPath();
+    for (let w = 0; w < shownWeek; w++) {
+      const x = X(START_WEEK + w), yv = Y(s.camp[w]);
+      w === 0 ? ctx.moveTo(x, yv) : ctx.lineTo(x, yv);
+    }
+    ctx.stroke();
+    const w = shownWeek - 1;
+    ctx.fillStyle = "#1f6f8b"; ctx.beginPath(); ctx.arc(X(START_WEEK + w), Y(s.camp[w]), 4.5, 0, 2 * Math.PI); ctx.fill();
+  }
+  // legend
+  ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.font = "12px system-ui, sans-serif";
+  legend.forEach(([col, kind, text, x0, r]) => {
+    const yy = 14 + 18 * r;
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = kind === "line" ? 3 : 2;
+    if (kind === "dot") { ctx.beginPath(); ctx.arc(x0 + 9, yy, 3.5, 0, 2 * Math.PI); ctx.fill(); }
+    else { ctx.setLineDash(kind === "dash" ? [6, 4] : []); ctx.beginPath(); ctx.moveTo(x0, yy); ctx.lineTo(x0 + 18, yy); ctx.stroke(); ctx.setLineDash([]); }
+    ctx.fillStyle = "#1b2430"; ctx.fillText(text, x0 + 24, yy);
+  });
+}
+
+function recompute() { state = runScenario(params()); showParams(); showOutputs(); draw(); }
+
+function loop(ts) {
+  if (ts - lastTick > 140) {
+    lastTick = ts; shownWeek = Math.min(shownWeek + 1, HORIZON); showOutputs(); draw();
+  }
+  if (shownWeek >= HORIZON) { stop(); $("startBtn").textContent = "Done"; $("startBtn").disabled = true; return; }
   frame = requestAnimationFrame(loop);
 }
 function start() { running = true; $("startBtn").textContent = "Pause"; frame = requestAnimationFrame(loop); }
-function stop() { running = false; if (frame) cancelAnimationFrame(frame); $("startBtn").textContent = "Start"; }
+function stop() { running = false; if (frame) cancelAnimationFrame(frame); frame = null; $("startBtn").textContent = "Start"; }
 function reset() {
-  stop(); initSim(params()); clearView(); showOutputs();
-  $("startBtn").disabled = false; $("startBtn").textContent = "Start";
+  stop(); setDefaults(); shownWeek = 0;
+  $("startBtn").disabled = false; $("startBtn").textContent = "Start"; recompute();
+}
+
+function runChecks() {
+  const b = weeklyCases(THETA.beta, THETA.rho, THETA.I0, MU_V_DEFAULT, 0, Infinity);
+  const pk = argmax(b);
+  const c = weeklyCases(THETA.beta, THETA.rho, THETA.I0, MU_V_DEFAULT, REF.p, 7 * (pk - REF.offset));
+  const rows = [["check1", "Baseline peak", Math.max(...b), REF.baseline],
+                ["check2", `Peak with ${REF.p * 100}% cut, ${REF.offset} weeks before peak`, Math.max(...c), REF.campaign]];
+  rows.forEach(([id, name, demo, ref]) => {
+    const raw = 100 * (demo - ref) / ref, diff = Math.abs(raw) < 0.005 ? 0 : raw, ok = Math.abs(diff) <= 1;
+    $(id).innerHTML = `${name}: demo <b>${demo.toFixed(1)}</b>, notebook ${ref.toFixed(1)} ` +
+      `(difference ${diff >= 0 ? "+" : ""}${diff.toFixed(2)}%) <span class="${ok ? "ok" : "warn"}">${ok ? "✓ within 1%" : "✗ outside 1%"}</span>`;
+  });
 }
 
 $("startBtn").addEventListener("click", () => (running ? stop() : start()));
 $("resetBtn").addEventListener("click", reset);
-["nTotal", "speed"].forEach((id) => $(id).addEventListener("input", showParams));
-["nTotal", "seed"].forEach((id) => $(id).addEventListener("change", reset));
-$("outRef").textContent = REFERENCE.toFixed(5);
-showParams(); reset();
+["pCut", "offset", "r0", "rho", "life"].forEach((id) => $(id).addEventListener("input", recompute));
+window.addEventListener("resize", draw);
+runChecks();
+reset();
 </script>
 </body>
 </html>

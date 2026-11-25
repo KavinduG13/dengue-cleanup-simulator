@@ -4,8 +4,7 @@ A host–vector dengue model, calibrated to 2026 weekly case data for Colombo Di
 
 **[Live demo](https://kavindug13.github.io/dengue-cleanup-simulator/)** · [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/KavinduG13/dengue-cleanup-simulator/blob/main/notebook/dengue-cleanup-simulator.ipynb)
 
-<!-- TODO (Day 4): replace this figure with figures/demo-screenshot.png once the web demo is built. -->
-![Weekly reported dengue cases in Colombo District, 2026](figures/colombo_2026_data.png)
+![Screenshot of the web demo](figures/demo-screenshot.png)
 
 ## The problem
 
