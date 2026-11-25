@@ -5,3 +5,6 @@ __pycache__/
 Thumbs.db
 .env
 *.key
+
+.venv/
+__pycache__/
